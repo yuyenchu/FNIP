@@ -2,7 +2,7 @@ import { nanoid } from 'https://cdn.jsdelivr.net/npm/nanoid/nanoid.js'
 import ticker from './ticker.js'
 
 function findTickers(text) {
-    const regex = /\b[A-Z]{1,4}\b/gm;
+    const regex = /\b[A-Z]{1,5}\b/gm;
     let matches = text.match(regex) ?? [];
     let count = matches.reduce((accu, curr) => {
         return (
