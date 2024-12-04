@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./report.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+    <script src="./html2canvas.min.js"></script>
+    <script src="./jspdf.umd.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div id="control">
+            <a href="#" id="download"><i class="fa-solid fa-file-arrow-down fa-2x"></i></a>
+            <a href="#" id="remove"><i class="fa-solid fa-trash-can fa-2x"></i></a>
+        </div>
+        <h1>Analyze Report</h1>
+        <div id="report">
+            <h3 id="company"></h3>
+            <h3 id="url"></h3>
+            <h3 id="datetime"></h3>
+            <h3 id="sentiment"></h3>
+            <h3>Article: </h3>
+            <p id="article"></p>
+        </div>
+    </div>
+    <script src="./report.js" type="module"></script>
+</body>
+
+</html>

@@ -1,0 +1,50 @@
+body {
+    position: relative;
+    background: #fdfdfd;
+    height: 1122px;
+    width: 794px;
+    border: solid 1px red;
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%
+}
+
+.container > h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#control {
+    position: absolute;
+    display: flex;
+    gap: 16px;
+    top: 20px;
+    right: 20px
+}
+
+#control > a > i {
+    /* width: 18px;
+    height: 18px; */
+    color: rgb(43, 43, 163);
+}
+
+#report {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* width: 100%; */
+    padding: 20px;
+}
+
+#report > h3 {
+    text-align: center;
+}
+
+#report > p {
+    line-break: loose;
+}

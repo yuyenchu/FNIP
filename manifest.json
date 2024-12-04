@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "Financial News Impact Plugin",
+    "version": "0.0.3",
+    "permissions": [
+        "storage",
+        "contextMenus"
+    ],
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+    "action": {
+        "default_title": "Click to view a popup",
+        "default_popup": "popup/popup.html"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://finance.yahoo.com/*"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ]
+}
