@@ -7,7 +7,7 @@ function sortTable(i){
 }
 
 function getSentimentCell(sentiments) {
-    let senti = sentiments[0]?.reduce((accu, curr)=>curr.score>accu.score?curr:accu, {label:'', score:-1});
+    let senti = sentiments?.[0]?.reduce((accu, curr)=>curr.score>accu.score?curr:accu, {label:'', score:-1});
     if (senti===undefined || senti.label==='' ) return 'Failed';
     console.log(sentiments, senti);
     let color = {'positive':'#32CD32','negative':'#FF4500','neutral':'#1E90FF'}[senti.label];

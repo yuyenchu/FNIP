@@ -69,7 +69,8 @@ async function getSentiment(text, id) {
         }).then((response) => {
             return response.json();
         }).then((response) => {
-            return [[JSON.parse(response.choices[0].message.content)]];
+            let data = response?.choices?.[0]?.message?.content;
+            return data?[[JSON.parse(data)]]:response;
         }).catch((err) => {
             console.log('Fetch Error:', err);
         });
