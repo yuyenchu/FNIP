@@ -30,6 +30,18 @@ async function addRoot() {
     console.log('root id =', ROOT)
 }
 
+async function initialize() {
+    console.log('initialize')
+    const localData = await chrome.storage.local.get(null);
+    if (localData['FNIP_HISTORY']===undefined) {
+        await chrome.storage.local.set({'FNIP_HISTORY': []});
+    }
+    if (localData['FNIP_SETTINGS']===undefined) {
+        await chrome.storage.local.set({'FNIP_SETTINGS': {}});
+    }
+    await addRoot();
+}
+
 async function getSentiment(text) {
     const settings = (await chrome.storage.local.get(null))['FNIP_SETTINGS'];
     return fetch('https://api-inference.huggingface.co/models/mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis', {
@@ -62,17 +74,7 @@ async function generateReport(id) {
     }
 }
 
-chrome.runtime.onStartup.addListener(async() => {
-    console.log('initialize')
-    const localData = await chrome.storage.local.get(null);
-    if (localData['FNIP_HISTORY']===undefined) {
-        await chrome.storage.local.set({'FNIP_HISTORY': []});
-    }
-    if (localData['FNIP_SETTINGS']===undefined) {
-        await chrome.storage.local.set({'FNIP_SETTINGS': {}});
-    }
-    await addRoot();
-})
+chrome.runtime.onInstalled.addListener(initialize);
 
 chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
     console.log(request);
