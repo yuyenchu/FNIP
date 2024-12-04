@@ -22,7 +22,11 @@ async function remove() {
 function formatSentiment(sentiment) {
     if (sentiment===undefined || sentiment[0]===undefined) return JSON.stringify(sentiment);
     let senti = sentiment[0];
-    return `${senti[0].label}:${senti[0].score}\n${senti[1].label}:${senti[1].score}\n${senti[2].label}:${senti[2].score}\n`
+    return senti.reduce((accu, curr)=>{
+        console.log(curr);
+        return accu+`${curr.label}: ${curr.score}`+(curr.impact_time?` - Impact time: ${curr.impact_time} day(s)`:'')+(curr.reason?`\n    Reason: ${curr.reason}`:'')+'\n'
+    } ,'');
+    // return `${senti[0].label}:${senti[0].score}\n${senti[1].label}:${senti[1].score}\n${senti[2].label}:${senti[2].score}\n`
 }
 
 const uid = new URLSearchParams(location.search).get('uid');

@@ -37,31 +37,60 @@ async function initialize() {
         await chrome.storage.local.set({'FNIP_HISTORY': []});
     }
     if (localData['FNIP_SETTINGS']===undefined) {
-        await chrome.storage.local.set({'FNIP_SETTINGS': {}});
+        await chrome.storage.local.set({'FNIP_SETTINGS': {API_KEY:'', LLM:'HF'}});
     }
     await addRoot();
 }
 
-async function getSentiment(text) {
+async function getSentiment(text, id) {
     const settings = (await chrome.storage.local.get(null))['FNIP_SETTINGS'];
-    return fetch('https://api-inference.huggingface.co/models/mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis', {
-        headers: {
-            "content-type": "application/json",
-            "Authorization": `Bearer ${settings.API_KEY}` // "Bearer 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"
-          },
-        method: "POST",
-        body: JSON.stringify({inputs: text})
-    }).then((response) => {
-        return response.json();
-    }).catch((err) => {
-        console.log('Fetch Error:', err);
-    });
+    if (settings.LLM==='GPT'){
+        return fetch('https://api.chatanywhere.org/v1/chat/completions', {
+            headers: {
+                "content-type": "application/json",
+                "Authorization": `Bearer ${settings.API_KEY}` // "Bearer sk-5P67sLZnVOArfQMolFskdAFhzvsNKVADNuLu5ieL2m273IYA"
+              },
+            method: "POST",
+            body: JSON.stringify({
+                "model": "gpt-4o-mini",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "Please act as a financial news sentiment analyzer bot, when the article and company name is given, return a \"positive\", \"neutral\", or \"negative\" sentiment label with a zero to one scale sentiment strength score in float, an estimated stock impact time range in unit of days, and a brief reasoning. The answer should be in the following json format:\n{\"label\": \"<sentiment_choice>\"\n\"score\":<strength_score>\n\"impact_time\": <estimated_impact_time>,\n\"reason\":<brief_reasoning>}"      
+                    },
+                    {
+                        "role": "user",
+                        "content": `company name:${ticker[id]}\narticle:\n${text}`
+                    }
+                ]
+            })
+        }).then((response) => {
+            return response.json();
+        }).then((response) => {
+            return [[JSON.parse(response.choices[0].message.content)]];
+        }).catch((err) => {
+            console.log('Fetch Error:', err);
+        });
+    } else {
+        return fetch('https://api-inference.huggingface.co/models/mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis', {
+            headers: {
+                "content-type": "application/json",
+                "Authorization": `Bearer ${settings.API_KEY}` // "Bearer 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"
+              },
+            method: "POST",
+            body: JSON.stringify({inputs: text})
+        }).then((response) => {
+            return response.json();
+        }).catch((err) => {
+            console.log('Fetch Error:', err);
+        });
+    }
 }
 
 async function generateReport(id) {
     const text = (await chrome.storage.session.get('text')).text;
     const url = (await chrome.storage.session.get('url')).url;
-    const sentiments = await getSentiment(text);
+    const sentiments = await getSentiment(text, id);
     // console.log(sentiments);
     return {
         uid: nanoid(),

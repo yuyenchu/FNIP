@@ -63,8 +63,15 @@
                 <h1>Settings</h1>
                 <form id="form-setting">
                     <div class="input-block">
-                        <label for="apikey">Huggingface API key:</label>
+                        <label for="apikey">API key:</label>
                         <input id="API_KEY" name="apikey" type="text"/>
+                    </div>
+                    <div class="input-block">
+                        <label for="llm">Backend LLM:</label>
+                        <select name="llm" id="LLM">
+                            <option value="HF">Huggingface</option>
+                            <option value="GPT">ChatGPT</option>
+                        </select>
                     </div>
                     <button id="save-setting">Save</button>
                 </form>

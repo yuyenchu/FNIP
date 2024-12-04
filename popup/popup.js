@@ -69,7 +69,7 @@ chrome.storage.local.get(null, (data) => {
         }
         document.getElementById('save-setting').addEventListener('click', (e)=>{
             let settings = {...data.FNIP_SETTINGS}
-            document.querySelectorAll('#form-setting input').forEach((i)=>{
+            document.querySelectorAll('#form-setting input,select').forEach((i)=>{
                 settings[i.id] = i.value;
                 chrome.storage.local.set({'FNIP_SETTINGS':settings});
             });

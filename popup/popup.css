@@ -102,7 +102,7 @@ tbody > tr:hover::after {
     flex-direction: column;
     width: 100%;
     gap: 5px;
-    margin: 10px 8px;
+    margin: 0px 8px 10px;
 }
 
 form button {
