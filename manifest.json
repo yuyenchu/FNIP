@@ -17,7 +17,9 @@
     "content_scripts": [
         {
             "matches": [
-                "https://finance.yahoo.com/*"
+                "https://finance.yahoo.com/*",
+                "https://www.apple.com/newsroom/*",
+                "https://www.reuters.com/*"
             ],
             "js": [
                 "content.js"
