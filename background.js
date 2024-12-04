@@ -20,6 +20,8 @@ async function addRoot() {
     let suffix = '';
     if (!settings?.API_KEY) {
         suffix = ' (API key not set)'
+    } else if (settings?.LLM) {
+        suffix = ` (${settings.LLM})`
     }
     ROOT = await chrome.contextMenus.create({
         id: 'FRNIP_ROOT',
