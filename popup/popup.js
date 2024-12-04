@@ -79,8 +79,10 @@ chrome.storage.local.get(null, (data) => {
     }
 });
 
-
+let textValid=false, urlValid=false;
 chrome.storage.session.get(null, (data) => {
+    textValid = data.text?true:false;
+    urlValid = data.url?true:false;
     document.getElementById('textselect-search').style.background = data.text?'#0f0':'#f00';
     document.getElementById('urlselect-search').style.background = data.url?'#0f0':'#f00';
 });
@@ -91,11 +93,13 @@ document.getElementById('ticker-search').addEventListener('input', (e)=>{
         'ticker': e.target.value
     }, (res)=>{
         document.getElementById('tickervalid-search').style.background = res.valid?'#0f0':'#f00';
+        document.getElementById('submit-search').disabled = !res.valid || !textValid || !urlValid;
     });
 });
 document.getElementById('clear-search').addEventListener('click', (e)=>{
     chrome.storage.session.remove(['text', 'url']);
 });
+document.getElementById('submit-search').disabled = true;
 document.getElementById('submit-search').addEventListener('click', (e)=>{
     chrome.runtime.sendMessage({
         'message': 'triggerSearch',
