@@ -14,6 +14,19 @@
 //     });
 // }
 
+function downloadJSON(obj) 
+{
+    // console.log(JSON.stringify(obj));
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = dataStr;
+    a.download = `${document.title}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
+
 async function remove() {
     const data = (await chrome.storage.local.get(null)).FNIP_HISTORY.filter((item) => item.uid!==uid);
     await chrome.storage.local.set({'FNIP_HISTORY': data});
@@ -39,8 +52,9 @@ if (uid!==null && uid!==undefined) {
         document.getElementById('datetime').innerText = `Analyze date: ${new Date(data.timestamp).toLocaleString()}`;
         document.getElementById('sentiment').innerText = formatSentiment(data.sentiments);//JSON.stringify(data.sentiments);
         document.getElementById('article').innerText = data.text;
-        
+        document.getElementById('json').onclick = ()=>downloadJSON(data);
     });
     document.getElementById('download').onclick = window.print.bind();
     document.getElementById('remove').onclick = remove;
 }
+
