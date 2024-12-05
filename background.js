@@ -46,7 +46,7 @@ async function initialize() {
 
 async function getSentiment(text, id) {
     const settings = (await chrome.storage.local.get(null))['FNIP_SETTINGS'];
-    if (settings.LLM==='GPT'){
+    if (settings?.LLM==='GPT'){
         return fetch('https://api.chatanywhere.org/v1/chat/completions', {
             headers: {
                 "content-type": "application/json",
@@ -70,11 +70,19 @@ async function getSentiment(text, id) {
             return response.json();
         }).then((response) => {
             let data = response?.choices?.[0]?.message?.content;
-            return data?[[JSON.parse(data)]]:response;
+            // console.log('gpt data: ',data);
+            let ret = data;
+            try {
+                ret = [[JSON.parse(data)]];
+            } catch (error) {
+                console.error('gpt parsing: ', error);
+                return error;
+            }
+            return data?ret:response;
         }).catch((err) => {
             console.log('Fetch Error:', err);
         });
-    } else {
+    } else if (settings?.LLM==='HF'){
         return fetch('https://api-inference.huggingface.co/models/mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis', {
             headers: {
                 "content-type": "application/json",
@@ -86,13 +94,17 @@ async function getSentiment(text, id) {
             return response.json();
         }).catch((err) => {
             console.log('Fetch Error:', err);
+            return error;
         });
+    } else {
+        return {error: `LLM backend ${settings?.LLM} is not recognized`}
     }
 }
 
 async function generateReport(id) {
     const text = (await chrome.storage.session.get('text')).text;
     const url = (await chrome.storage.session.get('url')).url;
+    const llm = (await chrome.storage.local.get(null)).FNIP_SETTINGS?.LLM;
     const sentiments = await getSentiment(text, id);
     // console.log(sentiments);
     return {
@@ -103,6 +115,7 @@ async function generateReport(id) {
         sentiments,
         text,
         url,
+        llm,
     }
 }
 
