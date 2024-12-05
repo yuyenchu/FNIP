@@ -19,7 +19,24 @@
             "matches": [
                 "https://finance.yahoo.com/*",
                 "https://www.apple.com/newsroom/*",
-                "https://www.reuters.com/*"
+                "https://www.reuters.com/*",
+                "https://www.investors.com/*",
+                "https://www.bloomberg.com/*",
+                "https://www.cnbc.com/*",
+                "https://www.ft.com/*",
+                "https://www.marketwatch.com/*",
+                "https://www.wsj.com/*",
+                "https://www.economist.com/*",
+                "https://edition.cnn.com/*",
+                "https://moneymorning.com/*",
+                "https://www.thestreet.com/*",
+                "https://www.thisismoney.co.uk/money/*",
+                "https://www.investing.com/*",
+                "https://www.forbes.com/*"
+            ],
+            "exclude_matches": [
+                "*://www.cnbc.com/*video",
+                "*://www.cnbc.com/live-tv/*"
             ],
             "js": [
                 "content.js"
