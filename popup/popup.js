@@ -19,6 +19,14 @@ function openTab(uid) {
     chrome.tabs.create({url: `popup/report.html?uid=${uid}`});
 }
 
+function catchToUndefined(value, func) {
+    try {
+        return func(value);
+    } catch {
+        return undefined;
+    }
+}
+
 let tableItems = {};
 function updateTable() {
     chrome.storage.local.get(null, (history)=>{
@@ -28,9 +36,9 @@ function updateTable() {
             if (tableItems[item.uid]===undefined) {
                 let tr = document.createElement('tr');
                 tr.onclick = ()=>openTab(item.uid);
-                tr.innerHTML =  '<td>' + item.id + '</td>' +
-                                '<td>' + new URL(item.url).hostname + '</td>' +
-                                '<td>' + new Date(item.timestamp).toLocaleDateString() + '</td>' +
+                tr.innerHTML =  '<td>' + item?.id + '</td>' +
+                                '<td>' + catchToUndefined(item.url, (x)=>new URL(x).hostname) + '</td>' +
+                                '<td>' + catchToUndefined(item.timestamp, (x)=>new Date(x).toLocaleDateString()) + '</td>' +
                                 '<td>' + getSentimentCell(item.sentiments) + '</td>';
                 table.appendChild(tr);
                 tableItems[item.uid] = '';
