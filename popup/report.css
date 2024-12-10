@@ -1,10 +1,14 @@
 body {
+    --display: flex;
+    --justify-content: center;
     position: relative;
-    background: #fdfdfd;
+    background: #fff;
     min-height: 1122px;
+    text-align: center;
+    font-family: Arial, sans-serif;
     width: 794px;
-    border: solid 1px red;
-    margin: 0;
+    border: solid 1px rgb(16, 3, 3);
+    margin: 1;
 }
 
 .container {
@@ -42,9 +46,10 @@ body {
 }
 
 #report > h3 {
-    text-align: center;
+    text-align: left;
 }
 
 #report > p {
     line-break: loose;
+    text-align: left;
 }

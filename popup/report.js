@@ -37,7 +37,8 @@ function formatSentiment(sentiment) {
     let senti = sentiment[0];
     return senti.reduce((accu, curr)=>{
         console.log(curr);
-        return accu+`${curr.label}: ${curr.score}`+(curr.impact_time?` - Impact time: ${curr.impact_time} day(s)`:'')+(curr.reason?`\n    Reason: ${curr.reason}`:'')+'\n'
+        let roundedScore = Math.round(curr.score * 1000) / 1000;
+        return accu+`${curr.label}: ${roundedScore}`+(curr.impact_time?` - Impact time: ${curr.impact_time} day(s)`:'')+(curr.reason?`\n    Reason: ${curr.reason}`:'')+'\n'
     } ,'');
     // return `${senti[0].label}:${senti[0].score}\n${senti[1].label}:${senti[1].score}\n${senti[2].label}:${senti[2].score}\n`
 }
@@ -49,7 +50,7 @@ if (uid!==null && uid!==undefined) {
         const data = history.FNIP_HISTORY.find((item) => item.uid===uid);
         document.getElementById('company').innerText = `Company: ${data.id} (${data.company})`;
         document.getElementById('url').innerHTML = `Article link: <a href=${data.url}>${new URL(data.url).hostname}</a>`;
-        document.getElementById('datetime').innerText = `Analyze date: ${new Date(data.timestamp).toLocaleString()}`;
+        document.getElementById('datetime').innerText = `Analysis date: ${new Date(data.timestamp).toLocaleString()}`;
         document.getElementById('sentiment').innerText = formatSentiment(data.sentiments);//JSON.stringify(data.sentiments);
         document.getElementById('article').innerText = data.text;
         document.getElementById('json').onclick = ()=>downloadJSON(data);
