@@ -1,83 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./popup.css" />
-  </head>
-  <body>
+</head>
+<body>
     <div id="navbar">
-        <a href="#" class="tab-active" id="history"><i class="fa-solid fa-bars-staggered"></i></a>
-        <a href="#" id="search"><i class="fa-solid fa-magnifying-glass"></i></a>
-        <a href="#" id="setting"><i class="fa-solid fa-gear"></i></a>
+        <button id="history-tab" class="tab-active">History</button>
+        <button id="search-tab">Search</button>
+        <button id="settings-tab">Settings</button>
     </div>
-    <div id="tabs-container">
-        <div id="tab-history" class="tab-active">
-            <div class="container">
-              <h1>Analyze History</h1>
-              <div class="table-wrap">
-                  <table id="table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>DOMAIN</th>
-                            <th>DATE</th>
-                            <th>RESULT</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-              </div>
-            </div>
-        </div>
-        <div id="tab-search">
-            <div class="container">
-                <h1>Analyze Search</h1>
-                <form id="form-search">
-                    <div class="input-block">
-                        <label for="ticker">Stock Ticker:</label>
-                        <input id="ticker-search" name="ticker" type="text"/>
-                    </div>
-                    <div class="input-block check-block">
-                        <div>
-                            Text selected: <span id="textselect-search" class="check-icon"></span>
-                        </div>
-                        <div>
-                            URL selected: <span id="urlselect-search" class="check-icon"></span>
-                        </div>
-                        <div>
-                            Ticker valid: <span id="tickervalid-search" class="check-icon"></span>
-                        </div>
-                    </div>
-                    <div class="input-block check-block">
-                        <button id="clear-search">Clear</button>
-                        <button id="submit-search">Submit</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div id="tab-setting">
-            <div class="container">
-                <h1>Settings</h1>
-                <form id="form-setting">
-                    <div class="input-block">
-                        <label for="apikey">API key:</label>
-                        <input id="API_KEY" name="apikey" type="text"/>
-                    </div>
-                    <div class="input-block">
-                        <label for="llm">Backend LLM:</label>
-                        <select name="llm" id="LLM">
-                            <option value="HF">Huggingface</option>
-                            <option value="GPT">ChatGPT</option>
-                        </select>
-                    </div>
-                    <button id="save-setting">Save</button>
-                </form>
-            </div>
+    <div id="history-section" class="tab-content tab-active">
+        <h1>Analysis History</h1>
+        <div class="table-wrap">
+            <table id="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>DOMAIN</th>
+                        <th>DATE</th>
+                        <th>RESULT</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
+    <div id="search-section" class="tab-content">
+        <h1>Analysis Search</h1>
+        <form id="form-search">
+            <div class="input-block">
+                <label for="ticker">Stock Ticker:</label>
+                <input id="ticker-search" name="ticker" type="text" />
+            </div>
+            <div class="input-block check-block">
+                <div>Text selected: <span id="textselect-search" class="check-icon"></span></div>
+                <div>URL selected: <span id="urlselect-search" class="check-icon"></span></div>
+                <div>Ticker valid: <span id="tickervalid-search" class="check-icon"></span></div>
+            </div>
+            <div class="input-block check-block mb0">
+                <button id="submit-search">Submit</button>
+                <button id="clear-search">Clear</button>
+            </div>
+        </form>
+    </div>
+    <div id="settings-section" class="tab-content">
+        <h1>Settings</h1>
+        <form id="form-setting">
+            <div class="input-block">
+                <label for="apikey">API key:</label>
+                <input id="API_KEY" name="apikey" type="text" />
+            </div>
+            <div class="input-block">
+                <label for="llm">Backend LLM:</label>
+                <select id="LLM" name="llm">
+                    <option value="HF">Huggingface</option>
+                    <option value="GPT">ChatGPT</option>
+                </select>
+            </div>
+            <button id="save-setting">Save</button>
+        </form>
+    </div>
+
     <script src="./popup.js" type="module"></script>
-  </body>
+</body>
 </html>

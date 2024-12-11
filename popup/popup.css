@@ -1,47 +1,79 @@
 body {
     background: #f6f6f6;
-    /* height: 180px; */
-    width: 320px;
-    overflow-y: scroll;
-}
-
-#tabs-container > div {
-    display: none;
-}
-
-#tabs-container > div.tab-active {
-    display: block;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 10px;
+    width: 340px;
+    overflow-y: hidden;
 }
 
 #navbar {
-    margin-left: 10px;
+    position: relative;
     display: flex;
-    gap: 10px;
+    justify-content: space-between; 
+    margin-bottom: 15px;
 }
 
-#navbar > a {
-    color: #222;
+#navbar ::after{
+    content: '';
+    position: absolute;
+    bottom : -7px;
+    right: 0;
+    left: 0;
+    height: 1px;
+    background: #b8b8b8;
 }
 
-#navbar > a.tab-active {
-    color: #433ed7;
+#navbar button {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 10px 12px; 
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #000; 
+    cursor: pointer;
+    flex: 1;
+    margin: 0 5px; 
+    transition: background 0.3s ease, color 0.3s ease;
+    text-align: center;
 }
 
-.container {
-    height: 160px;
+#navbar button.tab-active {
+    background: #0066ff;
+    color: #fff;
 }
 
-h1 {
-    margin-top: 8px;
-    margin-bottom: 12px;
-    margin-left: 10px;
+.tab-content {
+    display: none;
+}
+
+.tab-content.tab-active {
+    display: block; 
+    padding: 15px;
+    padding-top: 8px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
+/* Just some padding for the headings enjoy :) */
+.tab-content h1 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    margin-top: 0;
+    margin-left: 5px;
 }
 
 .table-wrap {
-	height: 120px;
-	display: block;
-	overflow: scroll;
-	width: 100%;
+    max-height: 145px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 6px;
+    background: #fff;
 }
 
 table {
@@ -49,64 +81,90 @@ table {
     border-collapse: collapse;
 }
 
-thead th { 
-    position: sticky; 
-    top: 0; 
-    z-index: 1; 
-    background: #f6f6f6;
-    padding-bottom: 2px;
+thead th {
+    background: #0066ff;
+    color: #fff;
+    padding: 2px 8px 2px 3px;
+    position: sticky;
+    top: 0;
+    text-align: left;
 }
 
-thead th::after{
+thead th:first-child {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+thead th:last-child {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+thead th::after {
     content: '';
+    background: #fff;
     position: absolute;
-    height: 1px;
-    width: 100%;
+    top: -10px;
     left: 0;
-    bottom: 0;
-    background-color: #333;
-    margin: 0;
+    right: 0;
+    height: 10px;
 }
 
-tr {
-    position: relative;
-}
-
-tr > td {
-    text-align: center;
-    position: relative;
+tbody tr:hover {
+    background: #f0f8ff;
     cursor: pointer;
-}
-
-tbody > tr:hover::after {
-    content: '';
-    position: absolute;
-    height: 1px;
-    left: 3px;
-    width: calc(100% - 6px);
-    color: #666;
-    bottom: 0;
-    background-color: #666;
-    margin: 0;
-}
-
-.container > form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    transition: background 0.2s ease-in;
 }
 
 .input-block {
     display: flex;
     flex-direction: column;
-    width: 100%;
-    gap: 5px;
-    margin: 0px 8px 10px;
+    gap: 10px;
+    margin-bottom: 15px;
 }
 
-form button {
-    min-width: 60px;
+input, select, button {
+    width: 100%;
+    padding: 10px;
+    /* margin-bottom: 10px; */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.input-block input {
+    width: calc(100% - 20px);
+}
+
+/* Buttons (Clear, Submit, Save) */
+button {
+    background: #0066ff;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Button hover state */
+button:hover {
+    background: #004bb5;
+}
+
+#clear-search {
+    background: #ff0800;
+}
+
+#clear-search:hover {
+    background: #b51e00;
+}
+
+/* Disabled buttons */
+button:disabled {
+    background: #ddd;
+    color: #999;
+    cursor: not-allowed;
 }
 
 .check-block {
@@ -118,6 +176,8 @@ form button {
     display: flex;
     flex-direction: row;
     gap: 6px;
+    height: 18px;
+    margin: 5px 0;
 }
 
 .check-icon {
@@ -127,4 +187,20 @@ form button {
     align-self: center;
     background: #666;
     border-radius: 50%;
+}
+
+.mb0 {
+    margin-bottom: 0;
+}
+
+.mt0 {
+    margin-top: 0;
+}
+
+.ml0 {
+    margin-left: 0;
+}
+
+.mr0 {
+    margin-right: 0;
 }
