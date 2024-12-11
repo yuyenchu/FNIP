@@ -1,24 +1,3 @@
-function sortTable(i){
-    let table = document.querySelector("#table tbody");
-    let trs = table.rows;
-    Array.from(trs)
-        .sort((a, b) => a.cells[i].textContent - b.cells[i].textContent)
-        .forEach(tr => table.appendChild(tr));
-}
-
-function getSentimentCell(sentiments) {
-    let senti = sentiments?.[0]?.reduce((accu, curr)=>curr.score>accu.score?curr:accu, {label:'', score:-1});
-    if (senti===undefined || senti.label==='' ) return 'Failed';
-    console.log(sentiments, senti);
-    let color = {'positive':'#32CD32','negative':'#FF4500','neutral':'#1E90FF'}[senti.label];
-    let alpha = senti.score*0.8+0.2;
-    return `<span style="color:${color};opacity:${alpha}">${senti.label}</span>`
-}
-
-function openTab(uid) {
-    chrome.tabs.create({url: `popup/report.html?uid=${uid}`});
-}
-
 function catchToUndefined(value, func) {
     try {
         return func(value);
@@ -27,93 +6,95 @@ function catchToUndefined(value, func) {
     }
 }
 
-let tableItems = {};
 function updateTable() {
-    chrome.storage.local.get(null, (history)=>{
-        console.log(history);
-        let table = document.querySelector('table > tbody');
-        history.FNIP_HISTORY?.forEach((item) => {
-            if (tableItems[item.uid]===undefined) {
-                let tr = document.createElement('tr');
-                tr.onclick = ()=>openTab(item.uid);
-                tr.innerHTML =  '<td>' + item?.id + '</td>' +
-                                '<td>' + catchToUndefined(item.url, (x)=>new URL(x).hostname) + '</td>' +
-                                '<td>' + catchToUndefined(item.timestamp, (x)=>new Date(x).toLocaleDateString()) + '</td>' +
-                                '<td>' + getSentimentCell(item.sentiments) + '</td>';
-                table.appendChild(tr);
-                tableItems[item.uid] = '';
-            }
+    chrome.storage.local.get(null, (data) => {
+        const tableBody = document.querySelector('#table tbody');
+        tableBody.innerHTML = ''; // Clear existing rows
+        data.FNIP_HISTORY?.forEach((item) => {
+            const row = document.createElement('tr');
+            row.onclick = () => openTab(item.uid);
+            row.innerHTML = `
+                <td>${item.id}</td>
+                <td>${catchToUndefined(item.url, (x)=>new URL(x).hostname)}</td>
+                <td>${catchToUndefined(item.timestamp, (x)=>new Date(x).toLocaleDateString())}</td>
+                <td>${getSentimentCell(item.sentiments)}</td>`;
+            tableBody.appendChild(row);
         });
     });
 }
 
-updateTable();
-chrome.storage.local.onChanged.addListener(
-    () => updateTable()
-);
-
-function setTab(e) {
-    console.log('click', e.target.id, e.currentTarget.id);
-    document.querySelectorAll('#navbar > a').forEach((i)=>i.classList.remove('tab-active'));
-    document.querySelectorAll('#tabs-container > div').forEach((i)=>i.classList.remove('tab-active'));
-    e.currentTarget.classList.add('tab-active');
-    document.getElementById(`tab-${e.currentTarget.id}`).classList.add('tab-active');
-}
-document.querySelectorAll('#navbar > a').forEach((i)=>{
-    i.addEventListener('click', setTab);
-});
-
-const tab = new URLSearchParams(location.search).get('tab');
-if (tab!==null && tab!==undefined) {
-    console.log('default=', tab)
-    setTab({currentTarget: document.getElementById(tab)});
+function openTab(uid) {
+    chrome.tabs.create({ url: `popup/report.html?uid=${uid}` });
 }
 
-chrome.storage.local.get(null, (data) => {
-    if (data.FNIP_SETTINGS) {
-        console.log(data.FNIP_SETTINGS);
+function getSentimentCell(sentiments) {
+    let senti = sentiments?.[0]?.reduce((acc, cur) => (cur.score > acc.score ? cur : acc), { label: '', score: -1 });
+    if (!senti || senti.label === '') return 'Failed';
+    const color = { positive: '#32CD32', negative: '#FF4500', neutral: '#1E90FF' }[senti.label];
+    return `<span style="color:${color}">${senti.label}</span>`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const tabs = document.querySelectorAll('#navbar button');
+    const sections = document.querySelectorAll('.tab-content');
+
+    tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+            tabs.forEach((t) => t.classList.remove('tab-active'));
+            sections.forEach((s) => s.classList.remove('tab-active'));
+            tab.classList.add('tab-active');
+            sections[index].classList.add('tab-active');
+        });
+    });
+
+    chrome.storage.local.get('FNIP_SETTINGS', (data) => {
+        const settings = data.FNIP_SETTINGS || {};
+        console.log('settings:', settings);
         for (const [key, value] of Object.entries(data.FNIP_SETTINGS)) {
             document.getElementById(key).value = value;
         }
-        document.getElementById('save-setting').addEventListener('click', (e)=>{
-            let settings = {...data.FNIP_SETTINGS}
+
+        document.getElementById('save-setting').addEventListener('click', () => {
+            let newSettings = {...settings}
             document.querySelectorAll('#form-setting input,select').forEach((i)=>{
-                settings[i.id] = i.value;
-                chrome.storage.local.set({'FNIP_SETTINGS':settings});
+                newSettings[i.id] = i.value;
+            });
+            // Save settings to Chrome storage
+            chrome.storage.local.set({'FNIP_SETTINGS': newSettings}, () => {
+                alert('Settings saved!');
             });
         });
-    } else {
-        chrome.storage.local.set({'FNIP_SETTINGS':{}});
-    }
-});
-
-let textValid=false, urlValid=false;
-chrome.storage.session.get(null, (data) => {
-    textValid = data.text?true:false;
-    urlValid = data.url?true:false;
-    document.getElementById('textselect-search').style.background = data.text?'#0f0':'#f00';
-    document.getElementById('urlselect-search').style.background = data.url?'#0f0':'#f00';
-    document.getElementById('textselect-search').parentNode.title = data.text?.split('\n')?.[0]+'...';
-    document.getElementById('urlselect-search').parentNode.title = data.url;
-
-});
-document.getElementById('ticker-search').addEventListener('input', (e)=>{
-    // console.log(e.target.value)
-    chrome.runtime.sendMessage({
-        'message': 'checkTicker',
-        'ticker': e.target.value
-    }, (res)=>{
-        document.getElementById('tickervalid-search').style.background = res.valid?'#0f0':'#f00';
-        document.getElementById('submit-search').disabled = !res.valid || !textValid || !urlValid;
     });
-});
-document.getElementById('clear-search').addEventListener('click', (e)=>{
-    chrome.storage.session.remove(['text', 'url']);
-});
-document.getElementById('submit-search').disabled = true;
-document.getElementById('submit-search').addEventListener('click', (e)=>{
-    chrome.runtime.sendMessage({
-        'message': 'triggerSearch',
-        'ticker': document.getElementById('ticker-search').value
+
+    chrome.storage.local.onChanged.addListener(updateTable);
+    updateTable();
+
+    chrome.storage.session.get(null, (data) => {
+        const textValid = !!data.text;
+        const urlValid = !!data.url;
+
+        document.getElementById('textselect-search').style.background = textValid ? '#0f0' : '#f00';
+        document.getElementById('urlselect-search').style.background = urlValid ? '#0f0' : '#f00';
+        document.getElementById('textselect-search').parentNode.title = data.text?.split('\n')?.[0] + '...';
+        document.getElementById('urlselect-search').parentNode.title = data.url;
+
+        document.getElementById('ticker-search').addEventListener('input', (e) => {
+            chrome.runtime.sendMessage({ message: 'checkTicker', ticker: e.target.value }, (res) => {
+                document.getElementById('tickervalid-search').style.background = res.valid ? '#0f0' : '#f00';
+                document.getElementById('submit-search').disabled = !res.valid || !textValid || !urlValid;
+            });
+        });
+
+        document.getElementById('clear-search').addEventListener('click', () => {
+            chrome.storage.session.remove(['text', 'url']);
+        });
+
+        document.getElementById('submit-search').disabled = true;
+        document.getElementById('submit-search').addEventListener('click', () => {
+            chrome.runtime.sendMessage({
+                message: 'triggerSearch',
+                ticker: document.getElementById('ticker-search').value,
+            });
+        });
     });
 });
