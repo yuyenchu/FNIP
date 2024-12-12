@@ -29,7 +29,7 @@ A Chrome extension that helps investors analyze financial news articles by provi
 ## Configuration
 
 1. Click the extension icon in your browser toolbar
-2. Enter your API key in the settings
+2. Enter your API key in the settings ([HuggingFace](https://huggingface.co/settings/tokens/new?globalPermissions=inference.serverless.write&tokenType=fineGrained) or [GPT](https://api.chatanywhere.org/v1/oauth/free/render))
 3. Select your preferred LLM provider (HuggingFace or GPT)
 
 ## Usage
