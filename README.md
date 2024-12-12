@@ -2,6 +2,9 @@
 
 A Chrome extension that helps investors analyze financial news articles by providing sentiment analysis and stock ticker identification.
 
+##
+Demo: https://mediaspace.illinois.edu/media/t/1_pi6dtvtz
+
 ## Features
 
 - **Sentiment Analysis**: Analyzes the emotional tone and potential market impact of financial news articles using AI
