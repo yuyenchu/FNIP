@@ -17,7 +17,7 @@ function updateTable() {
                 <td>${item.id}</td>
                 <td>${catchToUndefined(item.url, (x)=>new URL(x).hostname)}</td>
                 <td>${catchToUndefined(item.timestamp, (x)=>new Date(x).toLocaleDateString())}</td>
-                <td>${getSentimentCell(item.sentiments)}</td>`;
+                <td>${catchToUndefined(item.sentiments, (x)=>getSentimentCell(x))}</td>`;
             tableBody.appendChild(row);
         });
     });
@@ -28,6 +28,7 @@ function openTab(uid) {
 }
 
 function getSentimentCell(sentiments) {
+    if (typeof(sentiments)==='string') return 'Failed';
     let senti = sentiments?.[0]?.reduce((acc, cur) => (cur.score > acc.score ? cur : acc), { label: '', score: -1 });
     if (!senti || senti.label === '') return 'Failed';
     const color = { positive: '#32CD32', negative: '#FF4500', neutral: '#1E90FF' }[senti.label];

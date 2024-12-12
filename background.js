@@ -73,14 +73,21 @@ async function getSentiment(text, id) {
             // console.log('gpt data: ',data);
             let ret = data;
             try {
-                ret = [[JSON.parse(data)]];
+                if (ret.startsWith('```')) {
+                    ret = ret.substring(ret.indexOf('{'));
+                }
+                if (ret.endsWith('```')) {
+                    ret = ret.substring(0, ret.lastIndexOf('}')+1);
+                }
+                ret = [[JSON.parse(ret)]];
             } catch (error) {
-                console.error('gpt parsing: ', error);
-                return error;
+                console.error('gpt parsing: ', error, ret);
+                return {error};
             }
             return data?ret:response;
         }).catch((err) => {
             console.log('Fetch Error:', err);
+            return {err};
         });
     } else if (settings?.LLM==='HF'){
         return fetch('https://api-inference.huggingface.co/models/mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis', {
@@ -94,7 +101,7 @@ async function getSentiment(text, id) {
             return response.json();
         }).catch((err) => {
             console.log('Fetch Error:', err);
-            return error;
+            return {err};
         });
     } else {
         return {error: `LLM backend ${settings?.LLM} is not recognized`}
