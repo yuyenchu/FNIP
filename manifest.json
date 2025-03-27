@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Financial News Impact Plugin",
-    "version": "0.0.5",
+    "version": "0.1.0",
     "permissions": [
         "storage",
         "contextMenus"
@@ -32,11 +32,18 @@
                 "https://www.thestreet.com/*",
                 "https://www.thisismoney.co.uk/money/*",
                 "https://www.investing.com/*",
-                "https://www.forbes.com/*"
+                "https://www.forbes.com/*",
+                "https://www.barrons.com/*",
+                "https://www.fool.com/*",
+                "https://www.businessinsider.com/*",
+                "https://www.seekingalpha.com/*",
+                "https://www.kiplinger.com/*",
+                "https://www.morningstar.com/*"
             ],
             "exclude_matches": [
                 "*://www.cnbc.com/*video",
-                "*://www.cnbc.com/live-tv/*"
+                "*://www.cnbc.com/live-tv/*",
+                "*://www.youtube.com/*"
             ],
             "js": [
                 "content.js"

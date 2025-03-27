@@ -23,6 +23,72 @@ function updateTable() {
     });
 }
 
+function updateFavorites() {
+    chrome.storage.local.get('FNIP_FAVORITES', (data) => {
+        const favoritesList = document.querySelector('.favorites-list');
+        favoritesList.innerHTML = ''; // Clear existing items
+        
+        const favorites = data.FNIP_FAVORITES || [];
+        if (favorites.length === 0) {
+            favoritesList.innerHTML = '<p>No favorite tickers added yet.</p>';
+            return;
+        }
+        
+        favorites.forEach((item) => {
+            const favoriteItem = document.createElement('div');
+            favoriteItem.className = 'favorite-item';
+            favoriteItem.innerHTML = `
+                <div class="favorite-info">
+                    <div class="favorite-ticker">${item.ticker}</div>
+                    <div class="favorite-company">${item.company}</div>
+                </div>
+                <div class="favorite-actions">
+                    <button class="use-ticker" title="Use this ticker">Use</button>
+                    <button class="remove-ticker" title="Remove from favorites">Remove</button>
+                </div>
+            `;
+            
+            // Add event listeners
+            favoriteItem.querySelector('.use-ticker').addEventListener('click', () => {
+                document.getElementById('ticker-search').value = item.ticker;
+                // Trigger the input event to validate the ticker
+                document.getElementById('ticker-search').dispatchEvent(new Event('input'));
+                // Switch to the search tab
+                document.getElementById('search-tab').click();
+            });
+            
+            favoriteItem.querySelector('.remove-ticker').addEventListener('click', () => {
+                removeFavorite(item.ticker);
+            });
+            
+            favoritesList.appendChild(favoriteItem);
+        });
+    });
+}
+
+function addFavorite(ticker, company) {
+    chrome.storage.local.get('FNIP_FAVORITES', (data) => {
+        const favorites = data.FNIP_FAVORITES || [];
+        // Check if ticker already exists
+        if (!favorites.some(item => item.ticker === ticker)) {
+            favorites.push({ ticker, company });
+            chrome.storage.local.set({ 'FNIP_FAVORITES': favorites }, () => {
+                updateFavorites();
+            });
+        }
+    });
+}
+
+function removeFavorite(ticker) {
+    chrome.storage.local.get('FNIP_FAVORITES', (data) => {
+        const favorites = data.FNIP_FAVORITES || [];
+        const updatedFavorites = favorites.filter(item => item.ticker !== ticker);
+        chrome.storage.local.set({ 'FNIP_FAVORITES': updatedFavorites }, () => {
+            updateFavorites();
+        });
+    });
+}
+
 function openTab(uid) {
     chrome.tabs.create({ url: `popup/report.html?uid=${uid}` });
 }
@@ -67,7 +133,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    chrome.storage.local.onChanged.addListener(updateTable);
+    // Initialize favorites
+    if (!chrome.storage.local.get('FNIP_FAVORITES')) {
+        chrome.storage.local.set({ 'FNIP_FAVORITES': [] });
+    }
+    updateFavorites();
+
+    // Add favorite ticker handler
+    document.getElementById('add-favorite').addEventListener('click', () => {
+        const tickerInput = document.getElementById('new-favorite-ticker');
+        const ticker = tickerInput.value.trim().toUpperCase();
+        
+        if (ticker) {
+            import('../ticker.js').then(module => {
+                const tickerData = module.default;
+                if (tickerData[ticker]) {
+                    addFavorite(ticker, tickerData[ticker]);
+                    tickerInput.value = '';
+                } else {
+                    alert('Invalid ticker symbol');
+                }
+            });
+        }
+    });
+
+    chrome.storage.local.onChanged.addListener((changes) => {
+        if (changes.FNIP_HISTORY) {
+            updateTable();
+        }
+        if (changes.FNIP_FAVORITES) {
+            updateFavorites();
+        }
+    });
+    
     updateTable();
 
     chrome.storage.session.get(null, (data) => {
@@ -92,9 +190,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('submit-search').disabled = true;
         document.getElementById('submit-search').addEventListener('click', () => {
+            // Also add to favorites if the ticker is valid
+            const ticker = document.getElementById('ticker-search').value.trim().toUpperCase();
+            import('../ticker.js').then(module => {
+                const tickerData = module.default;
+                if (tickerData[ticker]) {
+                    addFavorite(ticker, tickerData[ticker]);
+                }
+            });
+            
             chrome.runtime.sendMessage({
                 message: 'triggerSearch',
-                ticker: document.getElementById('ticker-search').value,
+                ticker: ticker,
             });
         });
     });

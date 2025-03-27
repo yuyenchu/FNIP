@@ -204,3 +204,78 @@ button:disabled {
 .mr0 {
     margin-right: 0;
 }
+
+/* Favorites section styling */
+.favorite-controls {
+  margin-bottom: 10px;
+}
+
+.favorites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.favorite-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f5f5f5;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.favorite-item:hover {
+  background-color: #e0e0e0;
+}
+
+.favorite-ticker {
+  font-weight: bold;
+}
+
+.favorite-company {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.favorite-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.favorite-actions button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.favorite-actions button:hover {
+  background-color: #d0d0d0;
+}
+
+.favorite-actions .use-ticker {
+  color: #1a73e8;
+}
+
+.favorite-actions .remove-ticker {
+  color: #ea4335;
+}
+
+/* Mobile-friendly adjustments */
+@media (max-width: 480px) {
+  .favorite-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .favorite-actions {
+    align-self: flex-end;
+  }
+}

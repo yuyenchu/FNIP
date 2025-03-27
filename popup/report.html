@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
     <script src="./html2canvas.min.js"></script>
     <script src="./jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -16,6 +17,7 @@
         <div id="control">
             <a href="#" id="json"><i class="fa-solid fa-code fa-2x"></i></a>
             <a href="#" id="download"><i class="fa-solid fa-file-arrow-down fa-2x"></i></a>
+            <a href="#" id="share"><i class="fa-solid fa-share-nodes fa-2x"></i></a>
             <a href="#" id="remove"><i class="fa-solid fa-trash-can fa-2x"></i></a>
         </div>
         <h1>Article Analysis Summary</h1>
@@ -23,11 +25,55 @@
             <h3 id="company"></h3>
             <h3 id="url"></h3>
             <h3 id="datetime"></h3>
-            <h3 id="sentiment"></h3>
+            
+            <div class="stock-performance-section">
+                <h3>Current Stock Performance</h3>
+                <div id="stock-data"></div>
+            </div>
+            
+            <div class="sentiment-section">
+                <h3>Sentiment Analysis</h3>
+                <div class="sentiment-visualization">
+                    <div class="chart-container">
+                        <canvas id="sentimentChart"></canvas>
+                    </div>
+                    <div id="sentiment-details"></div>
+                </div>
+            </div>
+            
+            <div class="impact-section">
+                <h3>Market Impact Prediction</h3>
+                <div id="impact-time"></div>
+                <div id="impact-reason"></div>
+            </div>
+            
             <h3>Article that was analyzed: </h3>
             <p id="article"></p>
         </div>
     </div>
+    
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Share Analysis</h2>
+            <div class="share-options">
+                <button id="copyLink" class="share-button">
+                    <i class="fa-solid fa-link"></i> Copy Link
+                </button>
+                <button id="shareTwitter" class="share-button">
+                    <i class="fa-brands fa-twitter"></i> Twitter
+                </button>
+                <button id="shareLinkedIn" class="share-button">
+                    <i class="fa-brands fa-linkedin"></i> LinkedIn
+                </button>
+                <button id="shareEmail" class="share-button">
+                    <i class="fa-solid fa-envelope"></i> Email
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <script src="./report.js" type="module"></script>
 </body>
 

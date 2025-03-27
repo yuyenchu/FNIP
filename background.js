@@ -2,8 +2,18 @@ import { nanoid } from 'https://cdn.jsdelivr.net/npm/nanoid/nanoid.js'
 import ticker from './ticker.js'
 
 function findTickers(text) {
-    const regex = /\b[A-Z]{1,5}\b/gm;
+    // Improved regex to better match stock tickers and reduce false positives
+    // Matches 1-5 uppercase letters that are standalone words or preceded by $ symbol
+    const regex = /(\$[A-Z]{1,5}\b|\b[A-Z]{1,5}\b)(?![a-z])/gm;
+    
+    // Filter out common English words and abbreviations that aren't likely to be tickers
+    const commonWords = new Set(['I', 'A', 'AN', 'THE', 'AND', 'OR', 'BUT', 'IF', 'TO', 'FOR', 'IN', 'ON', 'BY', 'AT']);
+    
     let matches = text.match(regex) ?? [];
+    // Clean up matches by removing $ prefix and filtering out common words
+    matches = matches.map(match => match.replace('$', '')).filter(match => !commonWords.has(match));
+    
+    // Count occurrences
     let count = matches.reduce((accu, curr) => {
         return (
             accu[curr] ? ++accu[curr] : (accu[curr] = 1),
@@ -40,6 +50,9 @@ async function initialize() {
     }
     if (localData['FNIP_SETTINGS']===undefined) {
         await chrome.storage.local.set({'FNIP_SETTINGS': {API_KEY:'', LLM:'HF'}});
+    }
+    if (localData['FNIP_FAVORITES']===undefined) {
+        await chrome.storage.local.set({'FNIP_FAVORITES': []});
     }
     await addRoot();
 }
@@ -108,18 +121,72 @@ async function getSentiment(text, id) {
     }
 }
 
+async function getStockPerformance(ticker) {
+    try {
+        const response = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=5d`);
+        const data = await response.json();
+        
+        if (!data || !data.chart || !data.chart.result || data.chart.result.length === 0) {
+            return { error: 'No data available' };
+        }
+        
+        const result = data.chart.result[0];
+        const quote = result.indicators.quote[0];
+        const timestamps = result.timestamp;
+        const closes = quote.close;
+        const volumes = quote.volume;
+        
+        // Get the most recent valid closing price and the one from 1 and 5 days ago
+        let currentPrice = null;
+        let oneDayAgoPrice = null;
+        let fiveDayAgoPrice = null;
+        
+        for (let i = closes.length - 1; i >= 0; i--) {
+            if (closes[i] !== null && currentPrice === null) {
+                currentPrice = closes[i];
+            } else if (closes[i] !== null && oneDayAgoPrice === null) {
+                oneDayAgoPrice = closes[i];
+            } else if (closes[i] !== null && i <= closes.length - 5 && fiveDayAgoPrice === null) {
+                fiveDayAgoPrice = closes[i];
+                break;
+            }
+        }
+        
+        if (!currentPrice) return { error: 'No valid price data' };
+        
+        // Calculate daily and 5-day performance
+        const oneDayPerf = oneDayAgoPrice ? ((currentPrice - oneDayAgoPrice) / oneDayAgoPrice) * 100 : null;
+        const fiveDayPerf = fiveDayAgoPrice ? ((currentPrice - fiveDayAgoPrice) / fiveDayAgoPrice) * 100 : null;
+        
+        return {
+            ticker,
+            currentPrice: parseFloat(currentPrice.toFixed(2)),
+            oneDayPerformance: oneDayPerf ? parseFloat(oneDayPerf.toFixed(2)) : null,
+            fiveDayPerformance: fiveDayPerf ? parseFloat(fiveDayPerf.toFixed(2)) : null,
+            lastUpdated: new Date().toISOString()
+        };
+    } catch (error) {
+        console.error(`Error fetching stock data for ${ticker}:`, error);
+        return { error: 'Failed to fetch stock data' };
+    }
+}
+
 async function generateReport(id) {
     const text = (await chrome.storage.session.get('text')).text;
     const url = (await chrome.storage.session.get('url')).url;
     const llm = (await chrome.storage.local.get(null)).FNIP_SETTINGS?.LLM;
     const sentiments = await getSentiment(text, id);
-    // console.log(sentiments);
+    
+    // Get real-time stock performance
+    const stockPerformance = await getStockPerformance(id);
+    
     return {
         uid: nanoid(),
         id: id,
         company: ticker[id],
         timestamp: Date.now(),
         sentiments,
+        stockPerformance,
         text,
         url,
         llm,

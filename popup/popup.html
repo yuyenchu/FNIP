@@ -11,6 +11,7 @@
     <div id="navbar">
         <button id="history-tab" class="tab-active">History</button>
         <button id="search-tab">Search</button>
+        <button id="favorites-tab">Favorites</button>
         <button id="settings-tab">Settings</button>
     </div>
     <div id="history-section" class="tab-content tab-active">
@@ -46,6 +47,18 @@
                 <button id="clear-search">Clear</button>
             </div>
         </form>
+    </div>
+    <div id="favorites-section" class="tab-content">
+        <h1>Favorite Tickers</h1>
+        <div class="favorite-controls">
+            <div class="input-block">
+                <input id="new-favorite-ticker" type="text" placeholder="Enter ticker symbol" />
+                <button id="add-favorite">Add</button>
+            </div>
+        </div>
+        <div class="favorites-list">
+            <!-- Favorite tickers will be listed here -->
+        </div>
     </div>
     <div id="settings-section" class="tab-content">
         <h1>Settings</h1>

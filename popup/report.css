@@ -53,3 +53,215 @@ body {
     line-break: loose;
     text-align: left;
 }
+
+.sentiment-section, .impact-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.sentiment-visualization {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.chart-container {
+    height: 200px;
+    margin-bottom: 15px;
+}
+
+.sentiment-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.sentiment-label {
+    width: 80px;
+    font-weight: bold;
+}
+
+.sentiment-score-bar {
+    flex-grow: 1;
+    height: 12px;
+    background-color: #e9ecef;
+    border-radius: 6px;
+    margin: 0 10px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 6px;
+}
+
+.sentiment-score-value {
+    width: 50px;
+    text-align: right;
+    font-weight: bold;
+}
+
+.impact-time-display, .impact-reason-display {
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+.stock-performance-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stock-performance-data {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.stock-price {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.price-label {
+    font-weight: bold;
+    min-width: 120px;
+}
+
+.price-value {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.stock-changes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.change-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.change-label {
+    font-weight: bold;
+    min-width: 120px;
+}
+
+.change-value {
+    font-weight: bold;
+}
+
+.data-timestamp {
+    font-size: 0.8em;
+    color: #666;
+    margin-top: 5px;
+}
+
+@media print {
+    .container {
+        padding: 0;
+        margin: 0;
+    }
+    
+    #control {
+        display: none;
+    }
+    
+    body {
+        font-size: 11pt;
+    }
+    
+    .sentiment-section, .impact-section {
+        break-inside: avoid;
+    }
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+}
+
+.share-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.share-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 1rem;
+}
+
+.share-button:hover {
+    background-color: #e0e0e0;
+}
+
+#copyLink {
+    background-color: #4285F4;
+    color: white;
+}
+
+#shareTwitter {
+    background-color: #1DA1F2;
+    color: white;
+}
+
+#shareLinkedIn {
+    background-color: #0e76a8;
+    color: white;
+}
+
+#shareEmail {
+    background-color: #EA4335;
+    color: white;
+}
