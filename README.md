@@ -21,6 +21,26 @@ Demo: https://mediaspace.illinois.edu/media/t/1_pi6dtvtz
 - **Context Menu Integration**: Easy access to analysis tools through right-click menu
 - **History Tracking**: Saves analysis history for future reference
 - **Configurable AI Models**: Choose between different LLM providers for sentiment analysis
+- **Retrieval Augmented Generation (RAG)**: Enhanced analysis using historical context
+  - Stores previous analyses in a vector database
+  - Retrieves relevant historical context for new analyses
+  - Provides more context-aware sentiment analysis
+  - Toggle RAG functionality in settings
+
+## RAG Functionality
+
+The extension now includes Retrieval Augmented Generation (RAG) capabilities to provide more context-aware analysis:
+
+- **Vector Store**: Previous analyses are stored in a vector database using HNSWLib
+- **Context Retrieval**: When analyzing new content, the system retrieves relevant historical analyses
+- **Enhanced Analysis**: The AI model considers historical context when generating new analyses
+- **Toggle Control**: Enable/disable RAG functionality through the settings panel
+- **Local Storage**: All vector data is stored locally in your browser for privacy
+
+To use RAG:
+1. Open the extension settings
+2. Toggle the "Enable RAG" switch
+3. The system will automatically start using historical context for new analyses
 
 ## Installation
 
