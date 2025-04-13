@@ -205,4 +205,41 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
+
+    // Settings section
+    const settingsTab = document.getElementById('settings-tab');
+    const formSetting = document.getElementById('form-setting');
+    const saveSetting = document.getElementById('save-setting');
+
+    settingsTab.addEventListener('click', () => {
+        showTab('settings-section');
+    });
+
+    saveSetting.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(formSetting);
+        const settings = {
+            API_KEY: formData.get('apikey'),
+            LLM: formData.get('llm'),
+            RAG: formData.get('rag') === 'on'
+        };
+        
+        await chrome.storage.local.set({ 'FNIP_SETTINGS': settings });
+        
+        // Update the root menu title with RAG status
+        const suffix = settings.RAG ? ' (RAG enabled)' : '';
+        await chrome.contextMenus.update('FRNIP_ROOT', {
+            title: 'FNIP' + suffix
+        });
+        
+        alert('Settings saved successfully!');
+    });
+
+    // Load saved settings
+    chrome.storage.local.get('FNIP_SETTINGS', (data) => {
+        const settings = data.FNIP_SETTINGS || {};
+        document.getElementById('API_KEY').value = settings.API_KEY || '';
+        document.getElementById('LLM').value = settings.LLM || 'HF';
+        document.getElementById('RAG').checked = settings.RAG || false;
+    });
 });

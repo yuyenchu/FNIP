@@ -1,5 +1,6 @@
 import { nanoid } from 'https://cdn.jsdelivr.net/npm/nanoid/nanoid.js'
 import ticker from './ticker.js'
+import ragManager from './rag.js'
 
 function findTickers(text) {
     // Improved regex to better match stock tickers and reduce false positives
@@ -58,66 +59,92 @@ async function initialize() {
 }
 
 async function getSentiment(text, id) {
-    const settings = (await chrome.storage.local.get(null))['FNIP_SETTINGS'];
-    if (settings?.LLM==='GPT'){
-        return fetch('https://api.chatanywhere.org/v1/chat/completions', {
-            headers: {
-                "content-type": "application/json",
-                "Authorization": `Bearer ${settings.API_KEY}` // "Bearer sk-5P67sLZnVOArfQMolFskdAFhzvsNKVADNuLu5ieL2m273IYA"
-              },
-            method: "POST",
-            body: JSON.stringify({
-                "model": "gpt-4o-mini",
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": "Please act as a financial news sentiment analyzer bot, when the article and company name is given, return a \"positive\", \"neutral\", or \"negative\" sentiment label with a zero to one scale sentiment strength score in float, an estimated stock impact time range in unit of days, and a brief reasoning. The answer should be in the following json format:\n{\"label\": \"<sentiment_choice>\"\n\"score\":<strength_score>\n\"impact_time\": <estimated_impact_time>,\n\"reason\":<brief_reasoning>}"      
-                    },
-                    {
-                        "role": "user",
-                        "content": `company name:${ticker[id]}\narticle:\n${text}`
-                    }
-                ]
-            })
-        }).then((response) => {
-            return response.json();
-        }).then((response) => {
-            let data = response?.choices?.[0]?.message?.content;
-            // console.log('gpt data: ',data);
-            let ret = data;
-            try {
-                if (ret.startsWith('```')) {
-                    ret = ret.substring(ret.indexOf('{'));
-                }
-                if (ret.endsWith('```')) {
-                    ret = ret.substring(0, ret.lastIndexOf('}')+1);
-                }
-                ret = [[JSON.parse(ret)]];
-            } catch (error) {
-                console.error('gpt parsing: ', error, ret);
-                return {error};
+    try {
+        const settings = (await chrome.storage.local.get(null))['FNIP_SETTINGS'];
+        if (!settings?.API_KEY) {
+            throw new Error('API key not set');
+        }
+
+        // Initialize RAG if enabled
+        let ragContext = '';
+        if (settings?.RAG) {
+            await ragManager.initialize();
+            const relevantContexts = await ragManager.retrieveRelevantContext(text);
+            if (relevantContexts.length > 0) {
+                ragContext = '\n\nRelevant context from previous analyses:\n' +
+                    relevantContexts.map(ctx => `- ${ctx.content}`).join('\n');
             }
-            return data?ret:response;
-        }).catch((err) => {
-            console.log('Fetch Error:', err);
-            return {err};
+            
+            // Add current analysis to RAG store
+            await ragManager.addDocument(text, {
+                id,
+                timestamp: new Date().toISOString(),
+                type: 'analysis'
+            });
+        }
+
+        // Prepare the prompt with RAG context if available
+        const prompt = `Analyze the following text for financial sentiment and implications${ragContext ? ' considering the provided context' : ''}:\n\n${text}`;
+
+        let response;
+        if (settings.LLM === 'GPT') {
+            response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${settings.API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: 'gpt-3.5-turbo',
+                    messages: [{ role: 'user', content: prompt }],
+                    temperature: 0.7
+                })
+            });
+        } else {
+            response = await fetch('https://api-inference.huggingface.co/models/facebook/bart-large-mnli', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${settings.API_KEY}`
+                },
+                body: JSON.stringify({
+                    inputs: prompt,
+                    parameters: {
+                        max_length: 500,
+                        temperature: 0.7
+                    }
+                })
+            });
+        }
+
+        if (!response.ok) {
+            throw new Error(`API request failed: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        let result;
+        
+        if (settings.LLM === 'GPT') {
+            result = data.choices[0].message.content;
+        } else {
+            result = data[0].generated_text;
+        }
+
+        // Update history with RAG indicator if used
+        const history = (await chrome.storage.local.get(null))['FNIP_HISTORY'] || [];
+        history.push({
+            id,
+            text,
+            result,
+            timestamp: new Date().toISOString(),
+            ragEnabled: settings?.RAG || false
         });
-    } else if (settings?.LLM==='HF'){
-        return fetch('https://api-inference.huggingface.co/models/mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis', {
-            headers: {
-                "content-type": "application/json",
-                "Authorization": `Bearer ${settings.API_KEY}` // "Bearer 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"
-              },
-            method: "POST",
-            body: JSON.stringify({inputs: text})
-        }).then((response) => {
-            return response.json();
-        }).catch((err) => {
-            console.log('Fetch Error:', err);
-            return {err};
-        });
-    } else {
-        return {error: `LLM backend ${settings?.LLM} is not recognized`}
+        await chrome.storage.local.set({ 'FNIP_HISTORY': history });
+
+        return result;
+    } catch (error) {
+        console.error('Error in getSentiment:', error);
+        throw error;
     }
 }
 

@@ -1,18 +1,29 @@
 {
     "manifest_version": 3,
-    "name": "Financial News Impact Plugin",
-    "version": "0.1.0",
+    "name": "FNIP",
+    "version": "1.0",
+    "description": "Financial News Impact Predictor",
     "permissions": [
         "storage",
-        "contextMenus"
+        "contextMenus",
+        "activeTab",
+        "scripting"
+    ],
+    "host_permissions": [
+        "https://api.openai.com/*",
+        "https://api-inference.huggingface.co/*"
     ],
     "background": {
         "service_worker": "background.js",
         "type": "module"
     },
     "action": {
-        "default_title": "Click to view a popup",
-        "default_popup": "popup/popup.html"
+        "default_popup": "popup/popup.html",
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        }
     },
     "content_scripts": [
         {
@@ -52,8 +63,13 @@
     ],
     "icons": {
         "16": "icons/icon16.png",
-        "32": "icons/icon32.png",
         "48": "icons/icon48.png",
         "128": "icons/icon128.png"
-      }
+    },
+    "web_accessible_resources": [
+        {
+            "resources": ["ticker.js", "rag.js"],
+            "matches": ["<all_urls>"]
+        }
+    ]
 }
